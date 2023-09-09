@@ -41,6 +41,7 @@ desugarJdk = "2.0.3"
 lyricist = "1.4.2"
 atomicfu = "0.22.0"
 okio = "3.5.0"
+codepoints = "0.6.1"
 
 [libraries]
 compose_runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
@@ -90,6 +91,7 @@ desugarJdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "des
 lyricist = { module = "cafe.adriel.lyricist:lyricist", version.ref = "lyricist" }
 lyricist-processor = { module = "cafe.adriel.lyricist:lyricist-processor", version.ref = "lyricist" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+codepoints = { module = "de.cketti.unicode:kotlin-codepoints-deluxe", version.ref = "codepoints" }
 
 [plugins]
 android_application = { id = "com.android.application", version.ref = "android_gradle_plugin" }
