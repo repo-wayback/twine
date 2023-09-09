@@ -13,33 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
-rootProject.name = "twine"
+plugins { alias(libs.plugins.kotlin.multiplatform) }
 
-pluginManagement {
-  repositories {
-    gradlePluginPortal()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    google()
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
+kotlin {
+  targetHierarchy.default()
+
+  jvm()
+  listOf(iosX64(), iosArm64(), iosSimulatorArm64())
+
+  sourceSets {
+    val commonMain by getting { dependencies { implementation(libs.codepoints) } }
+    val commonTest by getting { dependencies { implementation(kotlin("test")) } }
   }
 }
-
-dependencyResolutionManagement {
-  repositories {
-    google()
-    mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven("https://jitpack.io")
-  }
-}
-
-include(":androidApp")
-
-include(":shared")
-
-include(":resources:strings")
-
-include(":resources:icons")
-
-include(":lexorank")
