@@ -1,0 +1,4 @@
+CREATE VIRTUAL TABLE IF NOT EXISTS feed_source USING FTS5(
+    link TEXT NOT NULL PRIMARY KEY,
+    tokenize="trigram"
+);
