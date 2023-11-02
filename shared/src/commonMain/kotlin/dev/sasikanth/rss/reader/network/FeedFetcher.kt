@@ -156,8 +156,7 @@ class FeedFetcher(private val httpClient: HttpClient, private val feedParser: Fe
 
               override fun onEnd() {
                 val host = URLBuilder(originalUrl).build().host
-                val rootUrl = "https://$host"
-                val feedUrl = FeedParser.safeUrl(rootUrl, link)
+                val feedUrl = FeedParser.safeUrl(host, link)
 
                 continuation.resume(feedUrl)
               }

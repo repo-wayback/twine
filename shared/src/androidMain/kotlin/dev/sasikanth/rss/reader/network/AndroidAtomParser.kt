@@ -41,6 +41,12 @@ internal class AndroidAtomParser(private val parser: XmlPullParser, private val 
 
   private val atomDateFormat = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
+  private val feedHost by
+    lazy(LazyThreadSafetyMode.NONE) {
+      val domain = Uri.parse(feedUrl)
+      domain.host ?: throw IllegalStateException("Failed to determine the feed host")
+    }
+
   override fun parse(): FeedPayload {
     parser.require(XmlPullParser.START_TAG, namespace, TAG_ATOM_FEED)
 
@@ -58,7 +64,7 @@ internal class AndroidAtomParser(private val parser: XmlPullParser, private val 
         }
         TAG_LINK -> {
           if (link.isNullOrBlank()) {
-            link = readAtomLink(name, parser)
+            link = FeedParser.safeUrl(feedHost, readAtomLink(name, parser))
           } else {
             skip(parser)
           }
@@ -67,7 +73,8 @@ internal class AndroidAtomParser(private val parser: XmlPullParser, private val 
           description = readTagText(name, parser)
         }
         TAG_ATOM_ENTRY -> {
-          posts.add(readAtomEntry(parser, link!!))
+          val host = Uri.parse(link!!).host!!
+          posts.add(readAtomEntry(parser, host))
         }
         else -> skip(parser)
       }
@@ -147,7 +154,7 @@ internal class AndroidAtomParser(private val parser: XmlPullParser, private val 
     return PostPayload(
       title = FeedParser.cleanText(title, decodeUrlEncoding = true).orEmpty(),
       description = FeedParser.cleanTextCompact(content, decodeUrlEncoding = true).orEmpty(),
-      link = FeedParser.cleanText(link)!!,
+      link = FeedParser.safeUrl(hostLink, link)!!,
       imageUrl = FeedParser.safeUrl(hostLink, image),
       date = dateLong,
       commentsLink = null

@@ -26,10 +26,10 @@ import dev.sasikanth.rss.reader.network.FeedParser.Companion.TAG_PUBLISHED
 import dev.sasikanth.rss.reader.network.FeedParser.Companion.TAG_SUBTITLE
 import dev.sasikanth.rss.reader.network.FeedParser.Companion.TAG_TITLE
 import io.github.aakira.napier.Napier
-import io.ktor.http.Url
 import io.sentry.kotlin.multiplatform.Sentry
 import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSLocale
+import platform.Foundation.NSURL
 import platform.Foundation.timeIntervalSince1970
 
 private val atomDateFormatter =
@@ -40,7 +40,7 @@ private val atomDateFormatter =
 
 internal fun PostPayload.Companion.mapAtomPost(
   atomMap: Map<String, String>,
-  hostLink: String
+  host: String
 ): PostPayload? {
   val title = atomMap[TAG_TITLE]
   val pubDate = atomMap[TAG_PUBLISHED]
@@ -66,8 +66,8 @@ internal fun PostPayload.Companion.mapAtomPost(
   return PostPayload(
     title = FeedParser.cleanText(title, decodeUrlEncoding = true).orEmpty(),
     description = FeedParser.cleanTextCompact(content, decodeUrlEncoding = true).orEmpty(),
-    link = FeedParser.cleanText(link)!!,
-    imageUrl = FeedParser.safeUrl(hostLink, imageUrl),
+    link = link!!,
+    imageUrl = FeedParser.safeUrl(host, imageUrl),
     date = pubDate.atomDateStringToEpochSeconds(),
     commentsLink = null
   )
@@ -79,13 +79,7 @@ internal fun FeedPayload.Companion.mapAtomFeed(
   posts: List<PostPayload>
 ): FeedPayload {
   val link = atomMap[TAG_LINK]!!.trim()
-  val domain = Url(link)
-  val host =
-    if (domain.host != "localhost") {
-      domain.host
-    } else {
-      throw NullPointerException("Unable to get host domain")
-    }
+  val host = NSURL(string = link).host!!
   val iconUrl = FeedParser.feedIcon(host)
 
   return FeedPayload(

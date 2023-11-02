@@ -43,6 +43,12 @@ import org.xmlpull.v1.XmlPullParser
 internal class AndroidRssParser(private val parser: XmlPullParser, private val feedUrl: String) :
   Parser() {
 
+  private val feedHost by
+    lazy(LazyThreadSafetyMode.NONE) {
+      val domain = Uri.parse(feedUrl)
+      domain.host ?: throw IllegalStateException("Failed to determine the feed host")
+    }
+
   private val rssDateFormat =
     DateTimeFormatterBuilder()
       .appendPattern("E, d MMM yyyy HH:mm:ss ")
@@ -71,13 +77,18 @@ internal class AndroidRssParser(private val parser: XmlPullParser, private val f
           title = readTagText(name, parser)
         }
         TAG_LINK -> {
-          link = readTagText(name, parser)
+          if (link.isNullOrBlank()) {
+            link = FeedParser.safeUrl(feedHost, readTagText(name, parser))
+          } else {
+            skip(parser)
+          }
         }
         TAG_DESCRIPTION -> {
           description = readTagText(name, parser)
         }
         TAG_RSS_ITEM -> {
-          posts.add(readRssItem(parser, link!!))
+          val host = Uri.parse(link!!).host!!
+          posts.add(readRssItem(parser, host))
         }
         else -> skip(parser)
       }
@@ -168,7 +179,7 @@ internal class AndroidRssParser(private val parser: XmlPullParser, private val f
     return PostPayload(
       title = FeedParser.cleanText(title, decodeUrlEncoding = true).orEmpty(),
       description = FeedParser.cleanTextCompact(description, decodeUrlEncoding = true).orEmpty(),
-      link = FeedParser.cleanText(link)!!,
+      link = FeedParser.safeUrl(hostLink, link)!!,
       imageUrl = FeedParser.safeUrl(hostLink, image),
       date = dateLong,
       commentsLink = commentsLink?.trim()

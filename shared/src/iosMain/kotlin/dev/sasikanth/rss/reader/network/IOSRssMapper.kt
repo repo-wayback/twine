@@ -26,9 +26,9 @@ import dev.sasikanth.rss.reader.network.FeedParser.Companion.TAG_IMAGE_URL
 import dev.sasikanth.rss.reader.network.FeedParser.Companion.TAG_LINK
 import dev.sasikanth.rss.reader.network.FeedParser.Companion.TAG_PUB_DATE
 import dev.sasikanth.rss.reader.network.FeedParser.Companion.TAG_TITLE
-import io.ktor.http.Url
 import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSLocale
+import platform.Foundation.NSURL
 import platform.Foundation.timeIntervalSince1970
 
 private val offsetTimezoneDateFormatter =
@@ -44,7 +44,7 @@ private val abbrevTimezoneDateFormatter =
 
 internal fun PostPayload.Companion.mapRssPost(
   rssMap: Map<String, String>,
-  hostLink: String
+  host: String
 ): PostPayload? {
   val title = rssMap[TAG_TITLE]
   val pubDate = rssMap[TAG_PUB_DATE]
@@ -78,8 +78,8 @@ internal fun PostPayload.Companion.mapRssPost(
   return PostPayload(
     title = FeedParser.cleanText(title, decodeUrlEncoding = true).orEmpty(),
     description = FeedParser.cleanTextCompact(description, decodeUrlEncoding = true).orEmpty(),
-    link = FeedParser.cleanText(link)!!,
-    imageUrl = FeedParser.safeUrl(hostLink, imageUrl),
+    link = link!!,
+    imageUrl = FeedParser.safeUrl(host, imageUrl),
     date = pubDate.rssDateStringToEpochSeconds(),
     commentsLink = commentsLink?.trim()
   )
@@ -91,13 +91,7 @@ internal fun FeedPayload.Companion.mapRssFeed(
   posts: List<PostPayload>
 ): FeedPayload {
   val link = rssMap[TAG_LINK]!!.trim()
-  val domain = Url(link)
-  val host =
-    if (domain.host != "localhost") {
-      domain.host
-    } else {
-      throw NullPointerException("Unable to get host domain")
-    }
+  val host = NSURL(string = link).host!!
   val iconUrl = FeedParser.feedIcon(host)
 
   return FeedPayload(

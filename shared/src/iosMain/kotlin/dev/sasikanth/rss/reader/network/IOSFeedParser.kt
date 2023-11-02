@@ -41,6 +41,7 @@ import dev.sasikanth.rss.reader.network.FeedType.ATOM
 import dev.sasikanth.rss.reader.network.FeedType.RSS
 import dev.sasikanth.rss.reader.utils.DispatchersProvider
 import dev.sasikanth.rss.reader.utils.XmlParsingError
+import io.ktor.http.set
 import kotlin.collections.set
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -48,6 +49,7 @@ import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
 import me.tatarka.inject.annotations.Inject
 import platform.Foundation.NSString
+import platform.Foundation.NSURL
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.NSXMLParser
 import platform.Foundation.NSXMLParserDelegateProtocol
@@ -86,6 +88,12 @@ private class IOSXmlFeedParser(
 ) : NSObject(), NSXMLParserDelegateProtocol {
 
   private val posts = mutableListOf<PostPayload?>()
+
+  private val feedHost by
+    lazy(LazyThreadSafetyMode.NONE) {
+      val domain = NSURL(string = feedUrl)
+      domain.host ?: throw IllegalStateException("Failed to determine the feed host")
+    }
 
   private var feedType: FeedType? = null
   private var currentChannelData: MutableMap<String, String> = mutableMapOf()
@@ -137,16 +145,17 @@ private class IOSXmlFeedParser(
 
     when {
       !currentItemData.containsKey(TAG_IMAGE_URL) && hasRssImageUrl(attributes) -> {
-        currentItemData[TAG_IMAGE_URL] = attributes[ATTR_URL] as String
+        val link = attributes[ATTR_URL] as String
+        currentItemData[TAG_IMAGE_URL] = link
       }
-      hasPodcastRssUrl() -> {
-        currentItemData[TAG_LINK] = attributes[ATTR_URL] as String
-      }
-      hasAtomLink(attributes) -> {
+      hasPodcastRssUrl() || hasAtomLink(attributes) -> {
+        val link = attributes[ATTR_HREF] as String
+
         if (currentChannelData[TAG_LINK].isNullOrBlank()) {
-          currentChannelData[TAG_LINK] = attributes[ATTR_HREF] as String
+          currentChannelData[TAG_LINK] = FeedParser.safeUrl(feedHost, link)!!
         }
-        currentItemData[TAG_LINK] = attributes[ATTR_HREF] as String
+
+        currentItemData[TAG_LINK] = FeedParser.safeUrl(feedHost, link)!!
       }
     }
 
@@ -172,10 +181,12 @@ private class IOSXmlFeedParser(
 
     if (didEndElement == TAG_RSS_ITEM || didEndElement == TAG_ATOM_ENTRY) {
       val hostLink = currentChannelData[TAG_LINK]!!
+      val host = NSURL(string = hostLink).host!!
+
       val post =
         when (feedType) {
-          RSS -> PostPayload.mapRssPost(currentItemData, hostLink)
-          ATOM -> PostPayload.mapAtomPost(currentItemData, hostLink)
+          RSS -> PostPayload.mapRssPost(currentItemData, host)
+          ATOM -> PostPayload.mapAtomPost(currentItemData, host)
           null -> null
         }
 
