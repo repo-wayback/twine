@@ -22,6 +22,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import dev.sasikanth.rss.reader.di.scopes.AppScope
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.atomicfu.AtomicRef
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
@@ -37,6 +39,12 @@ class LastUpdatedAt(private val dataStore: DataStore<Preferences>) {
   }
 
   private val lastUpdatedAtKey = stringPreferencesKey("pref_last_updated_at")
+  private val updatedFromRef: AtomicRef<UpdatedFrom> = atomic(UpdatedFrom.Idle)
+  var updatedFrom: UpdatedFrom
+    set(value) {
+      updatedFromRef.getAndSet(value)
+    }
+    get() = updatedFromRef.value
 
   suspend fun refresh() {
     dataStore.edit { preferences -> preferences[lastUpdatedAtKey] = Clock.System.now().toString() }
@@ -55,4 +63,13 @@ class LastUpdatedAt(private val dataStore: DataStore<Preferences>) {
       .map { preferences -> preferences[lastUpdatedAtKey] ?: return@map null }
       .first()
       ?.toInstant()
+
+  sealed interface UpdatedFrom {
+
+    object Idle : UpdatedFrom
+
+    object SwipeToRefresh : UpdatedFrom
+
+    object BackgroundRefresh : UpdatedFrom
+  }
 }
