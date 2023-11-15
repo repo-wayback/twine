@@ -34,6 +34,8 @@ import dev.sasikanth.rss.reader.feeds.ui.FeedsSheetMode.Default
 import dev.sasikanth.rss.reader.feeds.ui.FeedsSheetMode.Edit
 import dev.sasikanth.rss.reader.feeds.ui.FeedsSheetMode.LinkEntry
 import dev.sasikanth.rss.reader.models.local.PostWithMetadata
+import dev.sasikanth.rss.reader.refresh.LastUpdatedAt
+import dev.sasikanth.rss.reader.refresh.LastUpdatedAt.UpdatedFrom
 import dev.sasikanth.rss.reader.repository.FeedAddResult
 import dev.sasikanth.rss.reader.repository.ObservableSelectedFeed
 import dev.sasikanth.rss.reader.repository.RssRepository
@@ -74,6 +76,7 @@ class HomePresenter(
   private val rssRepository: RssRepository,
   private val observableSelectedFeed: ObservableSelectedFeed,
   private val settingsRepository: SettingsRepository,
+  private val lastUpdatedAt: LastUpdatedAt,
   @Assisted componentContext: ComponentContext,
   @Assisted private val openSearch: () -> Unit,
   @Assisted private val openBookmarks: () -> Unit,
@@ -91,7 +94,8 @@ class HomePresenter(
         rssRepository = rssRepository,
         observableSelectedFeed = observableSelectedFeed,
         settingsRepository = settingsRepository,
-        feedsPresenter = feedsPresenter
+        feedsPresenter = feedsPresenter,
+        lastUpdatedAt = lastUpdatedAt
       )
     }
 
@@ -127,6 +131,7 @@ class HomePresenter(
     private val observableSelectedFeed: ObservableSelectedFeed,
     private val settingsRepository: SettingsRepository,
     private val feedsPresenter: FeedsPresenter,
+    private val lastUpdatedAt: LastUpdatedAt,
   ) : InstanceKeeper.Instance {
 
     private val coroutineScope = CoroutineScope(SupervisorJob() + dispatchersProvider.main)
@@ -355,6 +360,7 @@ class HomePresenter(
       coroutineScope.launch {
         _state.update { it.copy(loadingState = HomeLoadingState.Loading) }
         try {
+          lastUpdatedAt.updatedFrom = UpdatedFrom.SwipeToRefresh
           val selectedFeed = _state.value.selectedFeed
           if (selectedFeed != null) {
             rssRepository.updateFeed(selectedFeed.link)

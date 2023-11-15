@@ -70,6 +70,8 @@ class LastUpdatedAt(private val dataStore: DataStore<Preferences>) {
 
     object SwipeToRefresh : UpdatedFrom
 
+    object AppStart : UpdatedFrom
+
     object BackgroundRefresh : UpdatedFrom
   }
 }

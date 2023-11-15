@@ -32,6 +32,7 @@ import dev.sasikanth.rss.reader.bookmarks.BookmarksPresenter
 import dev.sasikanth.rss.reader.di.scopes.ActivityScope
 import dev.sasikanth.rss.reader.home.HomePresenter
 import dev.sasikanth.rss.reader.refresh.LastUpdatedAt
+import dev.sasikanth.rss.reader.refresh.LastUpdatedAt.UpdatedFrom
 import dev.sasikanth.rss.reader.repository.RssRepository
 import dev.sasikanth.rss.reader.search.SearchPresenter
 import dev.sasikanth.rss.reader.settings.SettingsPresenter
@@ -158,6 +159,7 @@ class AppPresenter(
     fun refreshFeedsIfExpired() {
       coroutineScope.launch {
         if (lastUpdatedAt.hasExpired()) {
+          lastUpdatedAt.updatedFrom = UpdatedFrom.AppStart
           rssRepository.updateFeeds()
           lastUpdatedAt.refresh()
         }

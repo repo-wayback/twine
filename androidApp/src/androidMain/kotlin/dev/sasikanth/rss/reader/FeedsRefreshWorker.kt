@@ -23,6 +23,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import dev.sasikanth.rss.reader.refresh.LastUpdatedAt
+import dev.sasikanth.rss.reader.refresh.LastUpdatedAt.UpdatedFrom
 import dev.sasikanth.rss.reader.repository.RssRepository
 import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.SentryLevel
@@ -57,8 +58,11 @@ class FeedsRefreshWorker(
   override suspend fun doWork(): Result {
     return if (lastUpdatedAt.hasExpired()) {
       try {
+        lastUpdatedAt.updatedFrom = UpdatedFrom.BackgroundRefresh
+
         rssRepository.updateFeeds()
         lastUpdatedAt.refresh()
+
         Result.success()
       } catch (e: Exception) {
         Sentry.captureException(e) {
