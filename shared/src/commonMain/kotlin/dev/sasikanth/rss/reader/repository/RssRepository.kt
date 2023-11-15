@@ -30,6 +30,7 @@ import dev.sasikanth.rss.reader.models.local.Feed
 import dev.sasikanth.rss.reader.models.local.PostWithMetadata
 import dev.sasikanth.rss.reader.network.FeedFetchResult
 import dev.sasikanth.rss.reader.network.FeedFetcher
+import dev.sasikanth.rss.reader.refresh.LastUpdatedAt
 import dev.sasikanth.rss.reader.search.SearchSortOrder
 import dev.sasikanth.rss.reader.utils.Constants.NUMBER_OF_FEATURED_POSTS
 import dev.sasikanth.rss.reader.utils.DispatchersProvider
@@ -50,6 +51,7 @@ class RssRepository(
   private val postSearchFTSQueries: PostSearchFTSQueries,
   private val bookmarkQueries: BookmarkQueries,
   private val feedSearchFTSQueries: FeedSearchFTSQueries,
+  private val lastUpdatedAt: LastUpdatedAt,
   dispatchersProvider: DispatchersProvider
 ) {
 
@@ -138,23 +140,11 @@ class RssRepository(
   }
 
   fun posts(selectedFeedLink: String?): PagingSource<Int, PostWithMetadata> {
-    return QueryPagingSource(
-      countQuery =
-        postQueries.count(
-          feedLink = selectedFeedLink,
-          featuredPostsLimit = NUMBER_OF_FEATURED_POSTS
-        ),
-      transacter = postQueries,
+    return PostsPagingSource(
+      selectedFeed = selectedFeedLink,
+      postQueries = postQueries,
       context = ioDispatcher,
-      queryProvider = { limit, offset ->
-        postQueries.posts(
-          feedLink = selectedFeedLink,
-          featuredPostsLimit = NUMBER_OF_FEATURED_POSTS,
-          limit = limit,
-          offset = offset,
-          mapper = ::PostWithMetadata
-        )
-      }
+      updatedFrom = { lastUpdatedAt.updatedFrom }
     )
   }
 
