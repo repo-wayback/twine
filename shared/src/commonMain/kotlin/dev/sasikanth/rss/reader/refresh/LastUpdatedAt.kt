@@ -39,8 +39,8 @@ class LastUpdatedAt(private val dataStore: DataStore<Preferences>) {
   }
 
   private val lastUpdatedAtKey = stringPreferencesKey("pref_last_updated_at")
-  private val updatedFromRef: AtomicRef<UpdatedFrom> = atomic(UpdatedFrom.Idle)
-  var updatedFrom: UpdatedFrom
+  private val updatedFromRef: AtomicRef<UpdatedFrom?> = atomic(null)
+  var updatedFrom: UpdatedFrom?
     set(value) {
       updatedFromRef.getAndSet(value)
     }
@@ -65,8 +65,6 @@ class LastUpdatedAt(private val dataStore: DataStore<Preferences>) {
       ?.toInstant()
 
   sealed interface UpdatedFrom {
-
-    object Idle : UpdatedFrom
 
     object SwipeToRefresh : UpdatedFrom
 
