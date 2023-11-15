@@ -16,6 +16,7 @@
 package dev.sasikanth.rss.reader.utils
 
 internal object Constants {
+  const val NUMBER_OF_FEATURED_POSTS = 6L
   const val DATA_STORE_FILE_NAME = "twine.preferences_pb"
   const val BACKUP_FILE_NAME = "twine_backup.xml"
   const val EPSILON = 1e-6f

@@ -31,6 +31,7 @@ import dev.sasikanth.rss.reader.models.local.PostWithMetadata
 import dev.sasikanth.rss.reader.network.FeedFetchResult
 import dev.sasikanth.rss.reader.network.FeedFetcher
 import dev.sasikanth.rss.reader.search.SearchSortOrder
+import dev.sasikanth.rss.reader.utils.Constants.NUMBER_OF_FEATURED_POSTS
 import dev.sasikanth.rss.reader.utils.DispatchersProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.joinAll
@@ -53,7 +54,6 @@ class RssRepository(
 ) {
 
   companion object {
-    private const val NUMBER_OF_FEATURED_POSTS = 6L
     private const val UPDATE_CHUNKS = 20
   }
 
