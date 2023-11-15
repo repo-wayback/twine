@@ -79,7 +79,10 @@ android {
   }
 
   packaging {
-    resources { excludes.add("/META-INF/{AL2.0,LGPL2.1}") }
+    resources {
+      excludes.add("/META-INF/{AL2.0,LGPL2.1}")
+      excludes.add("/META-INF/versions/9/previous-compilation-data.bin")
+    }
 
     // Deprecated ABIs. See https://developer.android.com/ndk/guides/abis
     jniLibs.excludes.add("lib/mips/libsqlite3x.so")
