@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.ElevationTokens
@@ -38,6 +39,9 @@ internal fun BoxScope.CompactFloatingActionButton(
   label: String,
   visible: Boolean,
   modifier: Modifier = Modifier,
+  alignment: Alignment = Alignment.BottomEnd,
+  containerColor: Color = AppTheme.colorScheme.tintedForeground,
+  textColor: Color = AppTheme.colorScheme.tintedBackground,
   onClick: suspend () -> Unit
 ) {
   val coroutineScope = rememberCoroutineScope()
@@ -45,14 +49,11 @@ internal fun BoxScope.CompactFloatingActionButton(
     visible = visible,
     enter = slideInVertically { it },
     exit = slideOutVertically { it },
-    modifier = Modifier.align(Alignment.BottomEnd)
+    modifier = Modifier.align(alignment)
   ) {
     FilledTonalButton(
       modifier = modifier,
-      colors =
-        ButtonDefaults.filledTonalButtonColors(
-          containerColor = AppTheme.colorScheme.tintedHighlight
-        ),
+      colors = ButtonDefaults.filledTonalButtonColors(containerColor = containerColor),
       shape = MaterialTheme.shapes.medium,
       contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
       onClick = { coroutineScope.launch { onClick() } },
@@ -63,11 +64,7 @@ internal fun BoxScope.CompactFloatingActionButton(
           pressedElevation = ElevationTokens.Level5,
         )
     ) {
-      Text(
-        text = label,
-        style = MaterialTheme.typography.labelLarge,
-        color = AppTheme.colorScheme.textEmphasisHigh
-      )
+      Text(text = label, style = MaterialTheme.typography.labelLarge, color = textColor)
     }
   }
 }

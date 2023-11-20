@@ -229,6 +229,9 @@ internal fun HomeScreen(homePresenter: HomePresenter, modifier: Modifier = Modif
         CompactFloatingActionButton(
           label = LocalStrings.current.scrollToTop,
           visible = showScrollToTop,
+          alignment = Alignment.BottomEnd,
+          containerColor = AppTheme.colorScheme.tintedHighlight,
+          textColor = AppTheme.colorScheme.textEmphasisHigh,
           modifier =
             Modifier.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
               .padding(end = 16.dp, bottom = 16.dp),
