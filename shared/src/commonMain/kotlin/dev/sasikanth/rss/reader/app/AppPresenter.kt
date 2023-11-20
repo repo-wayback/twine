@@ -37,9 +37,11 @@ import dev.sasikanth.rss.reader.repository.RssRepository
 import dev.sasikanth.rss.reader.search.SearchPresenter
 import dev.sasikanth.rss.reader.settings.SettingsPresenter
 import dev.sasikanth.rss.reader.utils.DispatchersProvider
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
@@ -158,6 +160,10 @@ class AppPresenter(
 
     fun refreshFeedsIfExpired() {
       coroutineScope.launch {
+        // We are mainly doing this so that we can load existing articles in home screen first
+        // before we try and load new articles.
+        delay(5.seconds)
+
         if (lastUpdatedAt.hasExpired()) {
           lastUpdatedAt.updatedFrom = UpdatedFrom.AppStart
           rssRepository.updateFeeds()
