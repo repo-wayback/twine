@@ -57,7 +57,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -211,6 +210,10 @@ class HomePresenter(
 
     private fun init() {
       observableSelectedFeed.selectedFeed
+        .onEach { selectedFeed ->
+          _state.update { it.copy(selectedFeed = selectedFeed) }
+          effects.emit(HomeEffect.ScrollToTop)
+        }
         .flatMapLatest { selectedFeed ->
           val posts =
             createPager(config = createPagingConfig(pageSize = 20)) {
@@ -220,17 +223,21 @@ class HomePresenter(
               .cachedIn(coroutineScope)
 
           rssRepository.featuredPosts(selectedFeedLink = selectedFeed?.link).map { featuredPosts ->
-            Triple(selectedFeed, featuredPosts.toImmutableList(), posts)
+            Pair(featuredPosts.toImmutableList(), posts)
           }
         }
         .distinctUntilChanged()
-        .onEach { (selectedFeed, featuredPosts, posts) ->
-          _state.update {
-            it.copy(selectedFeed = selectedFeed, posts = posts, featuredPosts = featuredPosts)
+        .onEach { (featuredPosts, posts) ->
+          when (lastUpdatedAt.updatedFrom) {
+            UpdatedFrom.BackgroundRefresh,
+            UpdatedFrom.AppStart -> {
+              // TODO: Update state to show new articles button
+            }
+            else -> {
+              _state.update { it.copy(posts = posts, featuredPosts = featuredPosts) }
+            }
           }
         }
-        .distinctUntilChangedBy { (selectedFeed, _, _) -> selectedFeed }
-        .onEach { effects.emit(HomeEffect.ScrollToTop) }
         .launchIn(coroutineScope)
 
       settingsRepository.enableFeaturedItemBlur
