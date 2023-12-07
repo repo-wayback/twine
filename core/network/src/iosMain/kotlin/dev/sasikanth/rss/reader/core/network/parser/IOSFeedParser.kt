@@ -26,7 +26,7 @@ import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.ATTR_TY
 import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.ATTR_URL
 import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.ATTR_VALUE_ALTERNATE
 import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.HTML_TAG
-import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.RSS_TAG
+import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.RSS_V2_TAG
 import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.TAG_ATOM_ENTRY
 import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.TAG_ATOM_FEED
 import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.TAG_ENCLOSURE
@@ -126,7 +126,7 @@ private class IOSXmlFeedParser(
     if (feedType == null) {
       feedType =
         when (didStartElement) {
-          RSS_TAG -> RSS
+          RSS_V2_TAG -> RSS
           ATOM_TAG -> ATOM
           HTML_TAG -> throw HtmlContentException()
           else -> throw UnsupportedOperationException("Unknown feed type: $didStartElement")

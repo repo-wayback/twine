@@ -20,7 +20,7 @@ import android.util.Xml
 import dev.sasikanth.rss.reader.core.model.remote.FeedPayload
 import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.ATOM_TAG
 import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.HTML_TAG
-import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.RSS_TAG
+import dev.sasikanth.rss.reader.core.network.parser.FeedParser.Companion.RSS_V2_TAG
 import dev.sasikanth.rss.reader.exceptions.XmlParsingError
 import dev.sasikanth.rss.reader.util.DispatchersProvider
 import kotlinx.coroutines.withContext
@@ -42,7 +42,7 @@ class AndroidFeedParser(private val dispatchersProvider: DispatchersProvider) : 
           parser.nextTag()
 
           when (parser.name) {
-            RSS_TAG -> AndroidRssParser(parser, feedUrl).parse()
+            RSS_V2_TAG -> AndroidRssParser(parser, feedUrl).parse()
             ATOM_TAG -> AndroidAtomParser(parser, feedUrl).parse()
             HTML_TAG -> throw HtmlContentException()
             else -> throw UnsupportedOperationException("Unknown feed type: ${parser.name}")

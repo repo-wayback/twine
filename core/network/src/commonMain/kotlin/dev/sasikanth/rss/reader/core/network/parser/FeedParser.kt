@@ -24,7 +24,7 @@ import io.ktor.http.set
 interface FeedParser {
 
   companion object {
-    const val RSS_TAG = "rss"
+    const val RSS_V2_TAG = "rss"
     const val ATOM_TAG = "feed"
     const val HTML_TAG = "html"
 
