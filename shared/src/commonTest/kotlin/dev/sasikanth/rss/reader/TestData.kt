@@ -16,7 +16,86 @@
 package dev.sasikanth.rss.reader
 
 const val feedUrl = "https://example.com"
-const val rssXmlContent =
+
+const val rssV1XmlContent =
+  """
+<rdf:RDF xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:media="http://search.yahoo.com/mrss/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://purl.org/rss/1.0/">
+
+    <channel rdf:about="https://example.com">
+        <title>Feed title</title>
+        <link>https://example.com</link>
+        <description>Feed description</description>
+
+        <items>
+            <rdf:Seq>
+                <rdf:li rdf:resource="https://example.com/first-post" />
+                <rdf:li rdf:resource="https://example.com/second-post" />
+                <rdf:li rdf:resource="https://example.com/third-post" />
+                <rdf:li rdf:resource="https://example.com/fourth-post" />
+                <rdf:li rdf:resource="https://example.com/fifth-post" />
+                <rdf:li rdf:resource="https://example.com/post-with-relative-image" />
+                <rdf:li rdf:resource="https://example.com/post-with-comments" />
+            </rdf:Seq>
+        </items>
+    </channel>
+
+    <item rdf:about="https://example.com/first-post">
+        <title>Post with image</title>
+        <link>https://example.com/first-post</link>
+        <description>First post description.</description>
+        <dc:date>Thu, 25 May 2023 09:00:00 +0000</dc:date>
+        <media:content url="https://example.com/first-post-media-url" />
+    </item>
+    <item rdf:about="https://example.com/second-post">
+        <title>Post without image</title>
+        <link>https://example.com/second-post</link>
+        <description>Second post description.</description>
+        <dc:date>Thu, 25 May 2023 07:30:00 +0000</dc:date>
+    </item>
+    <item rdf:about="https://example.com/third-post">
+        <title>Podcast post</title>
+        <description>Third post description.</description>
+        <dc:date>Wed, 24 May 2023 10:30:00 +0000</dc:date>
+        <enclosure url="https://example.com/third-post" />
+    </item>
+    <item rdf:about="https://example.com/fourth-post">
+        <title>Post with enclosure image</title>
+        <description>Fourth post description.</description>
+        <dc:date>Wed, 24 May 2023 10:30:00 +0000</dc:date>
+        <enclosure url="https://example.com/fourth-post" />
+        <enclosure type="image/jpeg" url="https://example.com/enclosure-image" />
+    </item>
+    <item rdf:about="https://example.com/fifth-post">
+        <title>Post with description and encoded content</title>
+        <description>Fourth post description.</description>
+        <link>https://example.com/fifth-post</link>
+        <content:encoded>
+            &lt;p&gt;Fourth post description in HTML syntax.&lt;/p&gt; &lt;img
+            src="https://example.com/encoded-image" alt="encoded image" /&gt;
+        </content:encoded>
+        <dc:date>Wed, 24 May 2023 10:30:00 +0000</dc:date>
+    </item>
+    <item rdf:about="https://example.com/post-with-relative-image">
+        <title>Post with relative path image</title>
+        <link>https://example.com/post-with-relative-image</link>
+        <description>Relative image post description.</description>
+        <dc:date>Thu, 25 May 2023 09:00:00 +0000</dc:date>
+        <media:content url="/relative-media-url" />
+    </item>
+    <item rdf:about="https://example.com/post-with-comments">
+        <title>Post with comments</title>
+        <link>https://example.com/post-with-comments</link>
+        <description>Really long post with comments.</description>
+        <dc:date>Thu, 25 May 2023 09:00:00 +0000</dc:date>
+        <comments>https://example/post-with-comments/comments</comments>
+    </item>
+</rdf:RDF>
+  """
+
+const val rssV2XmlContent =
   """
   <rss version="2.0">
   <channel>

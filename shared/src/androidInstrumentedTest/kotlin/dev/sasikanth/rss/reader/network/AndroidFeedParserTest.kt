@@ -21,7 +21,7 @@ import dev.sasikanth.rss.reader.core.model.remote.FeedPayload
 import dev.sasikanth.rss.reader.core.model.remote.PostPayload
 import dev.sasikanth.rss.reader.core.network.parser.AndroidFeedParser
 import dev.sasikanth.rss.reader.feedUrl
-import dev.sasikanth.rss.reader.rssXmlContent
+import dev.sasikanth.rss.reader.rssV2XmlContent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
@@ -102,7 +102,7 @@ class AndroidFeedParserTest {
       )
 
     // when
-    val payload = feedParser.parse(rssXmlContent, feedUrl)
+    val payload = feedParser.parse(rssV2XmlContent, feedUrl)
 
     // then
     assertEquals(expectedFeedPayload, payload)
