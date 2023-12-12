@@ -20,6 +20,7 @@ androidApp/release
 .idea/compiler.xml
 .idea/artifacts
 .idea/deploymentTargetDropDown.xml
+.idea/deploymentTargetSelector.xml
 .idea/androidTestResultsUserPreferences.xml
 .idea/assetWizardSettings.xml
 .idea/modules.xml

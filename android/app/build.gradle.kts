@@ -20,6 +20,7 @@ plugins {
   alias(libs.plugins.compose)
   alias(libs.plugins.ksp)
   alias(libs.plugins.sentry.android)
+  alias(libs.plugins.baselineprofile)
 }
 
 sentry { tracingInstrumentation { enabled = false } }
@@ -91,8 +92,11 @@ android {
 }
 
 dependencies {
-  implementation(project(":shared"))
+  implementation(projects.shared)
+  baselineProfile(projects.android.baselineprofile)
+
   implementation(libs.kotlininject.runtime)
+  implementation(libs.profileinstaller)
   ksp(libs.kotlininject.compiler)
   implementation(libs.androidx.work)
   implementation(libs.sentry)
